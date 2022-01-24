@@ -6,7 +6,7 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 const personSchema = new mongoose.Schema({
     name: String,
     age: Number,
-    favoriteFoods: Array
+    favoriteFoods: [String]
 });
 
 let Person = mongoose.model('Person', personSchema);
@@ -34,21 +34,40 @@ const createManyPeople = (arrayOfPeople, done) => {
 };
 
 const findPeopleByName = (personName, done) => {
-  done(null /*, data*/);
+  Person.find({name: personName}, (err, data) => {
+    if (err) return console.error(err);
+    done(null, data);
+  });
 };
 
 const findOneByFood = (food, done) => {
-  done(null /*, data*/);
+  Person.findOne({favoriteFoods: food}, (err, data) => {
+    if (err) return console.error(err);
+    done(null, data);
+  })
 };
 
 const findPersonById = (personId, done) => {
-  done(null /*, data*/);
+  Person.findById(personId, (err, data) => {
+    if (err) return console.error(err);
+    done(null, data);
+  })
 };
 
 const findEditThenSave = (personId, done) => {
   const foodToAdd = "hamburger";
+  
+  // Find and edit
+  Person.findById(personId, (err, doc) => {
+    if (err) return console.error(err);
 
-  done(null /*, data*/);
+    // Update
+    doc.favoriteFoods.push(foodToAdd);
+    doc.save((err2, data) => {
+      if (err2) return console.log(err2);
+      done(null, data);
+    })
+  })
 };
 
 const findAndUpdate = (personName, done) => {
